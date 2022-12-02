@@ -9,6 +9,12 @@ from .helpers import *
 creating tables and fields
 '''
 
+class Profile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_verified = models.BooleanField(default=False)
+    token = models.CharField(max_length=100)
+
+
 class BlogModel(models.Model):
     title = models.CharField(max_length=1000)
     content = FroalaField()

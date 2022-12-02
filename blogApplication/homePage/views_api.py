@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from .models import Profile
+from .helpers import generate_random_string, send_mail_to_user
 
 
 class LoginView(APIView):
@@ -69,9 +71,17 @@ class RegisterView(APIView):
                 response['message'] = 'User name already taken'
                 raise Exception('user name already taken')
 
-            user_obj = User.objects.create(username=data.get('username'))
+            if not Profile.objects.filter(user=check_user).first().is_verified:
+                response['message'] = "Your profile is not yet verified"
+                raise Exception("Profile not yet verified")
+
+            user_obj = User.objects.create(email=data.get('username'), username=data.get('username'))
             user_obj.set_password(data.get('password'))
             user_obj.save()
+
+            token = generate_random_string(20)
+            Profile.objects.create(user=user_obj, token=token)
+            send_mail_to_user(token, data.get('username'))
             response['status'] = 200
             response['message'] = 'User created'
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .form import *
+from django.contrib.auth import logout
 
 # Create your views here.
 
@@ -107,3 +108,7 @@ def blog_update(request, slug):
 
 def register_view(request):
     return render(request, 'register.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
